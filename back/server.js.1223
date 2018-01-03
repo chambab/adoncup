@@ -1,0 +1,44 @@
+
+var express = require('express'); 
+var mongoose = require('mongoose');
+var app = express(); 
+
+var myLogger = function(req, res, next) {
+    console.log('logged');
+    next();
+};
+
+var requestTime = function (req, res, next) {
+  req.requestTime = Date.now();
+  next();
+};
+
+app.use(myLogger);
+app.use(requestTime);
+
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost/adoncup', { useMongoClient: true });
+// native Promise 
+mongoose.Promise = global.Promise;
+
+// ROUTERS
+var adv = require('./routes/advertises.js');
+app.use('/api/v1/advertises', adv);
+
+
+app.get('/', function(req, res){
+    res.send('HERE ADONCUP');
+});
+
+app.get('/listAd', function(req, res){
+    res.send('list advertisements');
+});
+
+app.put('/ad', function(req, res){
+    res.send('register advertisements');
+});
+
+var server = app.listen(3000, function(){
+    console.log("Adoncup server has started on port 3000") 
+})
