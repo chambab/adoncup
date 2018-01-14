@@ -36,7 +36,7 @@ exports.registerAd = function(req, res) {
 	ad.sub_txt = req.body.sub_txt;
 	ad.save();
 };
-
+// TODO
 exports.updateAd = function(req, res) {
 };
 
