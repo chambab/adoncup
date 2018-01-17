@@ -1,9 +1,9 @@
 'use strict';
 
-var express = require('express'); 
+var express = require('express');
 var mongoose = require('mongoose');
 var morgan = require('morgan');
-var app = express(); 
+var app = express();
 var apiroute = express.Router();
 const port = 3000;
 
@@ -19,25 +19,26 @@ var requestTime = function (req, res, next) {
   next();
 };
 
+// authenticate middleware
 var authcheck = function (req, res, next) {
     console.log("auth checking");
   if(req.headers && req.headers.authorization && req.headers.authorization.splt(' ')[0] === 'JWT') {
     jsonwebtoken.verify(req.headers.authorization.split(' ')[1], 'RESTFULAPIs', function(err, decode) {
-	console.log('here');
-	if(err) { 
-		return res.json({success: false, message: 'Failed to authenticate token'});
-	//req.user = undefined;
-	} else {
-		req.user = decode;
-		next();
-	}
-      });
-    } else {
-	req.user = undefined;
-	console.log(req.user);
-	return res.status(403).send({ success: false, message: 'No token provided'});
-	//next();
-    }
+      console.log('here');
+      if(err) {
+        return res.json({success: false, message: 'Failed to authenticate token'});
+        //req.user = undefined;
+      } else {
+        req.user = decode;
+        next();
+      }
+    });
+  } else {
+    req.user = undefined;
+    console.log(req.user);
+    return res.status(403).send({ success: false, message: 'No token provided'});
+    //next();
+  }
 };
 
 apiroute.use(authcheck);
@@ -56,7 +57,7 @@ app.use(morgan('dev'));
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost/adoncup', { useMongoClient: true });
-// native Promise 
+// native Promise
 mongoose.Promise = global.Promise;
 
 // ROUTERS
@@ -69,5 +70,5 @@ app.use('/api/v1/auth', require('./routes/auth.js'));
 
 
 var server = app.listen(port, function(){
-    console.log("Adoncup server has started on port 3000") 
+    console.log("Adoncup server has started on port 3000")
 })
